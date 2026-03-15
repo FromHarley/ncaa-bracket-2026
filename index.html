@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 NCAA Tournament Bracket</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111418;
+    --card: #161b22;
+    --border: #21262d;
+    --accent: #e8c84a;
+    --accent2: #4a9ee8;
+    --red: #e85a4a;
+    --green: #4ae87a;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --winner-bg: rgba(232, 200, 74, 0.08);
+    --winner-border: rgba(232, 200, 74, 0.4);
+    --updated: #f0a500;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 28px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0d1117 0%, var(--bg) 100%);
+    position: relative;
+  }
+  .header::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--red));
+  }
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(232,200,74,0.3);
+  }
+  .header p {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .subtitle-note {
+    display: inline-block;
+    margin-top: 8px;
+    background: rgba(74, 158, 232, 0.12);
+    border: 1px solid rgba(74, 158, 232, 0.3);
+    color: var(--accent2);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .update-note {
+    display: inline-block;
+    margin-top: 6px;
+    margin-left: 8px;
+    background: rgba(240, 165, 0, 0.12);
+    border: 1px solid rgba(240, 165, 0, 0.35);
+    color: var(--updated);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .dot-1 { background: var(--accent); }
+  .dot-elite { background: var(--green); }
+  .dot-final4 { background: var(--accent2); }
+  .dot-champ { background: var(--red); }
+  .dot-updated { background: var(--updated); }
+
+  /* PREDICTIONS BANNER */
+  .predictions-bar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+  .pred-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+  .pred-badge {
+    padding: 4px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-e8 { background: rgba(74,232,122,0.15); color: var(--green); border: 1px solid rgba(74,232,122,0.3); }
+  .badge-f4 { background: rgba(74,158,232,0.15); color: var(--accent2); border: 1px solid rgba(74,158,232,0.3); }
+  .badge-f2 { background: rgba(232,200,74,0.15); color: var(--accent); border: 1px solid rgba(232,200,74,0.3); }
+  .badge-champ { background: rgba(232,90,74,0.2); color: #ff8a7a; border: 1px solid rgba(232,90,74,0.5); }
+
+  /* CHANGES LOG */
+  .changes-log {
+    background: rgba(240,165,0,0.06);
+    border-bottom: 1px solid rgba(240,165,0,0.2);
+    padding: 10px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+  .changes-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--updated);
+  }
+  .change-tag {
+    background: rgba(240,165,0,0.1);
+    border: 1px solid rgba(240,165,0,0.25);
+    color: var(--updated);
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* MAIN BRACKET LAYOUT */
+  .bracket-wrapper {
+    padding: 20px 16px 40px;
+    overflow-x: auto;
+  }
+
+  /* REGIONS GRID */
+  .regions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+    min-width: 900px;
+  }
+
+  .region {
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .region-header {
+    background: var(--card);
+    padding: 8px 14px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .region-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+  .region-no1 {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .matchup-list { padding: 6px 8px; }
+
+  .matchup {
+    margin-bottom: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .matchup.predicted-win {
+    border-color: var(--winner-border);
+    background: var(--winner-bg);
+  }
+  .matchup.elite8 {
+    border-color: rgba(74,232,122,0.3);
+    background: rgba(74,232,122,0.05);
+  }
+  .matchup.updated-match {
+    border-color: rgba(240,165,0,0.4);
+    background: rgba(240,165,0,0.04);
+  }
+  .matchup-round-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .updated-badge {
+    display: inline-block;
+    background: rgba(240,165,0,0.2);
+    color: var(--updated);
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  .team-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 40px;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+  .team-row:first-of-type {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .seed-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .seed-num.s1 { color: var(--accent); }
+  .seed-num.s2 { color: #c9a227; }
+  .seed-num.s3 { color: #b8b8b8; }
+  .seed-num.s4, .seed-num.s5 { color: #a0a0a0; }
+
+  .team-name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .team-name.advance { color: var(--accent); font-weight: 700; }
+  .team-name.elite8-pick { color: var(--green); }
+  .team-name.final4-pick { color: var(--accent2); }
+  .team-name.finalist { color: #ff8a7a; }
+  .team-name.updated-team { color: var(--updated); font-weight: 700; }
+
+  .team-record {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* ADVANCEMENT SECTION */
+  .advancement-section {
+    border-top: 1px solid var(--border);
+    padding: 8px 8px 4px;
+  }
+  .adv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    font-size: 11px;
+  }
+  .adv-row.r32 { background: rgba(255,255,255,0.03); }
+  .adv-row.s16 { background: rgba(74,158,232,0.07); }
+  .adv-row.e8  { background: rgba(74,232,122,0.08); }
+  .adv-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    min-width: 65px;
+  }
+  .adv-team { font-weight: 700; letter-spacing: 0.5px; }
+  .adv-team.r32-t { color: var(--text); }
+  .adv-team.s16-t { color: var(--accent2); }
+  .adv-team.e8-t  { color: var(--green); }
+
+  /* CHAMPION SECTION */
+  .champion-section {
+    margin: 24px auto;
+    max-width: 600px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--winner-border);
+    border-radius: 8px;
+    padding: 24px 20px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .champion-section::before {
+    content:'';
+    position: absolute;
+    top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--red));
+  }
+  .champ-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--muted);
+  }
+  .champ-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 64px);
+    letter-spacing: 5px;
+    color: var(--accent);
+    text-shadow: 0 0 60px rgba(232,200,74,0.4);
+    margin: 4px 0;
+  }
+  .champ-record {
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+  .champ-path {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .path-badge {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  .path-badge span { color: var(--accent); font-weight: 700; }
+
+  /* FINAL FOUR / FINAL */
+  .final-rounds {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 800px;
+    margin: 0 auto 20px;
+    padding: 0 16px;
+  }
+  .final-card {
+    background: var(--card);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .final-card-header {
+    background: rgba(255,255,255,0.04);
+    padding: 6px 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .final-matchup {
+    padding: 10px 14px;
+  }
+  .final-team {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .final-team:last-child { border-bottom: none; }
+  .final-team.winner { color: var(--accent); }
+  .final-team.loser { color: var(--muted); }
+  .final-seed { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .vs-label {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 3px 0;
+    letter-spacing: 2px;
+  }
+
+  .section-title {
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    padding: 20px 0 12px;
+  }
+
+  /* First Four */
+  .firstfour-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    margin-bottom: 4px;
+  }
+  .ff-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .ff-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .ff-game {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 11px;
+    text-align: center;
+    min-width: 160px;
+  }
+  .ff-game.ff-updated {
+    border-color: rgba(240,165,0,0.35);
+    background: rgba(240,165,0,0.05);
+  }
+  .ff-game .ff-slot {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .ff-game .ff-teams {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .ff-game .ff-teams span { color: var(--accent); }
+  .ff-game .ff-teams span.updated { color: var(--updated); }
+
+  @media (max-width: 900px) {
+    .regions-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .final-rounds {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 500px) {
+    .regions-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>2026 NCAA Tournament</h1>
+  <p>Men's Basketball · Field of 68 · Indianapolis Final Four</p>
+  <div class="subtitle-note">Predicted Bracket · Pre-Selection Sunday · Mar 14, 2026</div>
+  <div class="update-note">⚡ Updated Mar 15, 2026 — Champ Week Final Results</div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="dot dot-1"></div> #1 Seed</div>
+  <div class="legend-item"><div class="dot dot-elite"></div> Elite Eight Pick</div>
+  <div class="legend-item"><div class="dot dot-final4"></div> Final Four Pick</div>
+  <div class="legend-item"><div class="dot dot-champ"></div> Predicted Champion</div>
+  <div class="legend-item"><div class="dot dot-updated"></div> Updated Post-Champ Week</div>
+</div>
+
+<!-- PREDICTIONS BAR -->
+<div class="predictions-bar">
+  <span class="pred-label">Elite 8 →</span>
+  <span class="pred-badge badge-e8">Michigan</span>
+  <span class="pred-badge badge-e8">Duke</span>
+  <span class="pred-badge badge-e8">Arizona</span>
+  <span class="pred-badge badge-e8">Florida</span>
+  <span class="pred-badge badge-e8">Houston</span>
+  <span class="pred-badge badge-e8">Gonzaga</span>
+  <span class="pred-badge badge-e8">Iowa St.</span>
+  <span class="pred-badge badge-e8">Purdue</span>
+  &nbsp;&nbsp;
+  <span class="pred-label">Final 4 →</span>
+  <span class="pred-badge badge-f4">Michigan</span>
+  <span class="pred-badge badge-f4">Duke</span>
+  <span class="pred-badge badge-f4">Arizona</span>
+  <span class="pred-badge badge-f4">Houston</span>
+  &nbsp;&nbsp;
+  <span class="pred-label">Final →</span>
+  <span class="pred-badge badge-f2">Michigan</span>
+  <span class="pred-badge badge-f2">Duke</span>
+  &nbsp;&nbsp;
+  <span class="pred-label">Champion →</span>
+  <span class="pred-badge badge-champ">🏆 MICHIGAN</span>
+</div>
+
+<!-- CHANGES LOG -->
+<div class="changes-log">
+  <span class="changes-label">⚡ Mar 15 Updates →</span>
+  <span class="change-tag">Portland St. → Idaho (Big Sky)</span>
+  <span class="change-tag">Miami (OH) → Akron (MAC)</span>
+  <span class="change-tag">UC Irvine → Hawaii (Big West)</span>
+  <span class="change-tag">Utah Valley → Cal Baptist (WAC)</span>
+  <span class="change-tag">UConn → St. John's (Big East)</span>
+  <span class="change-tag">UNC Wilmington → Hofstra (CAA)</span>
+  <span class="change-tag">Houston: 1-seed → 2-seed ⚠️</span>
+  <span class="change-tag">Florida: 1-seed ⚠️ Monitor</span>
+</div>
+
+<!-- FIRST FOUR -->
+<div class="firstfour-section">
+  <div class="ff-label">First Four — Dayton, OH</div>
+  <div class="ff-grid">
+    <div class="ff-game">
+      <div class="ff-slot">Play-In (16 seed)</div>
+      <div class="ff-teams"><span>UMBC</span> vs. Long Island</div>
+    </div>
+    <div class="ff-game ff-updated">
+      <div class="ff-slot">Play-In (16 seed) <span style="color:var(--updated)">↺ Updated</span></div>
+      <div class="ff-teams"><span>Tenn. St.</span> vs. <span class="updated">Idaho</span></div>
+    </div>
+    <div class="ff-game">
+      <div class="ff-slot">Play-In (11 seed)</div>
+      <div class="ff-teams"><span>VCU</span> vs. Missouri</div>
+    </div>
+    <div class="ff-game ff-updated">
+      <div class="ff-slot">Play-In (11 seed) <span style="color:var(--updated)">↺ Updated</span></div>
+      <div class="ff-teams"><span class="updated">Akron</span> vs. SMU</div>
+    </div>
+  </div>
+</div>
+
+<!-- BRACKET WRAPPER -->
+<div class="bracket-wrapper">
+<div class="regions-grid">
+
+  <!-- ===== EAST (DUKE) ===== -->
+  <div class="region">
+    <div class="region-header">
+      <span class="region-name">East Region</span>
+      <span class="region-no1">#1 Duke · Greenville/Boston</span>
+    </div>
+    <div class="matchup-list">
+
+      <div class="matchup predicted-win">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s1">1</div>
+          <div class="team-name advance">DUKE</div>
+          <div class="team-record">31-2</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">16</div>
+          <div class="team-name">TENN. ST. / PORT. ST.</div>
+          <div class="team-record">FF</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">8</div>
+          <div class="team-name advance">MISSOURI</div>
+          <div class="team-record">24-9</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">9</div>
+          <div class="team-name">IOWA</div>
+          <div class="team-record">22-10</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s2">5</div>
+          <div class="team-name advance">NORTH CAROLINA</div>
+          <div class="team-record">24-7</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">12</div>
+          <div class="team-name">S. FLORIDA</div>
+          <div class="team-record">23-8</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num s4">4</div>
+          <div class="team-name advance">GONZAGA</div>
+          <div class="team-record">30-3</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">13</div>
+          <div class="team-name updated-team">HOFSTRA</div>
+          <div class="team-record">20-14</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s3">3</div>
+          <div class="team-name advance">ILLINOIS</div>
+          <div class="team-record">24-8</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">14</div>
+          <div class="team-name">NAVY</div>
+          <div class="team-record">26-7</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num">6</div>
+          <div class="team-name advance">LOUISVILLE</div>
+          <div class="team-record">22-9</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">11</div>
+          <div class="team-name">UCLA</div>
+          <div class="team-record">23-10</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s2">2</div>
+          <div class="team-name advance">IOWA STATE</div>
+          <div class="team-record">27-7</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">15</div>
+          <div class="team-name">MERRIMACK</div>
+          <div class="team-record">22-11</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num">7</div>
+          <div class="team-name advance">MIAMI (FL)</div>
+          <div class="team-record">21-11</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">10</div>
+          <div class="team-name">TCU</div>
+          <div class="team-record">21-11</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="advancement-section">
+      <div class="adv-row r32"><span class="adv-label">Sweet 16</span><span class="adv-team r32-t">Duke · Iowa St.</span></div>
+      <div class="adv-row s16"><span class="adv-label">Elite 8</span><span class="adv-team s16-t elite8-pick">Duke</span></div>
+    </div>
+  </div>
+
+  <!-- ===== WEST (MICHIGAN) ===== -->
+  <div class="region">
+    <div class="region-header">
+      <span class="region-name">West Region</span>
+      <span class="region-no1">#1 Michigan · Salt Lake City/SF</span>
+    </div>
+    <div class="matchup-list">
+
+      <div class="matchup predicted-win">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s1">1</div>
+          <div class="team-name advance">MICHIGAN</div>
+          <div class="team-record">30-2</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">16</div>
+          <div class="team-name">UMBC / LONG ISLAND</div>
+          <div class="team-record">FF</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">8</div>
+          <div class="team-name advance">CLEMSON</div>
+          <div class="team-record">24-9</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">9</div>
+          <div class="team-name">TEXAS</div>
+          <div class="team-record">23-10</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s2">5</div>
+          <div class="team-name advance">MICHIGAN STATE</div>
+          <div class="team-record">25-7</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">12</div>
+          <div class="team-name">WRIGHT ST.</div>
+          <div class="team-record">20-14</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">4</div>
+          <div class="team-name advance">KANSAS</div>
+          <div class="team-record">23-10</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">13</div>
+          <div class="team-name">LIBERTY</div>
+          <div class="team-record">25-7</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s3">3</div>
+          <div class="team-name advance">PURDUE</div>
+          <div class="team-record">25-8</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">14</div>
+          <div class="team-name">LEHIGH</div>
+          <div class="team-record">18-16</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num">6</div>
+          <div class="team-name advance">WISCONSIN</div>
+          <div class="team-record">24-9</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">11</div>
+          <div class="team-name">DAYTON</div>
+          <div class="team-record">22-10</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Seed Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num s2">2</div>
+          <div class="team-name advance updated-team">HOUSTON ⚠️</div>
+          <div class="team-record">28-5</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">15</div>
+          <div class="team-name">N. DAKOTA ST.</div>
+          <div class="team-record">27-7</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num">7</div>
+          <div class="team-name advance updated-team">ST. JOHN'S</div>
+          <div class="team-record">28-6</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">10</div>
+          <div class="team-name">WICHITA ST.</div>
+          <div class="team-record">21-10</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="advancement-section">
+      <div class="adv-row r32"><span class="adv-label">Sweet 16</span><span class="adv-team r32-t">Michigan · Houston</span></div>
+      <div class="adv-row s16"><span class="adv-label">Elite 8</span><span class="adv-team s16-t">Houston · Michigan</span></div>
+      <div class="adv-row e8"><span class="adv-label">Final 4</span><span class="adv-team e8-t">MICHIGAN</span></div>
+    </div>
+  </div>
+
+  <!-- ===== SOUTH (ARIZONA) ===== -->
+  <div class="region">
+    <div class="region-header">
+      <span class="region-name">South Region</span>
+      <span class="region-no1">#1 Arizona · Memphis/Dallas</span>
+    </div>
+    <div class="matchup-list">
+
+      <div class="matchup predicted-win">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s1">1</div>
+          <div class="team-name advance">ARIZONA</div>
+          <div class="team-record">32-2</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">16</div>
+          <div class="team-name">HIGH POINT</div>
+          <div class="team-record">30-4</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">8</div>
+          <div class="team-name advance">VIRGINIA</div>
+          <div class="team-record">29-4</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">9</div>
+          <div class="team-name">VANDERBILT</div>
+          <div class="team-record">25-7</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s2">5</div>
+          <div class="team-name advance">ARKANSAS</div>
+          <div class="team-record">24-8</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">12</div>
+          <div class="team-name">HIGH POINT</div>
+          <div class="team-record">30-4</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">4</div>
+          <div class="team-name advance">TEXAS TECH</div>
+          <div class="team-record">22-10</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">13</div>
+          <div class="team-name">McNEESE</div>
+          <div class="team-record">28-5</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s3">3</div>
+          <div class="team-name advance">ALABAMA</div>
+          <div class="team-record">23-9</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">14</div>
+          <div class="team-name">HOWARD</div>
+          <div class="team-record">23-10</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num">6</div>
+          <div class="team-name advance">NORTH CAROLINA</div>
+          <div class="team-record">24-7</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">11</div>
+          <div class="team-name">VCU / MISSOURI</div>
+          <div class="team-record">FF</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num s2">2</div>
+          <div class="team-name advance updated-team">ST. JOHN'S</div>
+          <div class="team-record">28-6</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">15</div>
+          <div class="team-name">PRAIRIE VIEW A&M</div>
+          <div class="team-record">18-17</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num">7</div>
+          <div class="team-name advance">ST. MARY'S</div>
+          <div class="team-record">27-5</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">10</div>
+          <div class="team-name updated-team">UTAH STATE</div>
+          <div class="team-record">28-6</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="advancement-section">
+      <div class="adv-row r32"><span class="adv-label">Sweet 16</span><span class="adv-team r32-t">Arizona · St. John's</span></div>
+      <div class="adv-row s16"><span class="adv-label">Elite 8</span><span class="adv-team s16-t">Arizona</span></div>
+      <div class="adv-row e8"><span class="adv-label">Final 4</span><span class="adv-team e8-t">ARIZONA</span></div>
+    </div>
+  </div>
+
+  <!-- ===== MIDWEST (FLORIDA) ===== -->
+  <div class="region">
+    <div class="region-header">
+      <span class="region-name">Midwest Region</span>
+      <span class="region-no1">#1 Florida · Cleveland/Detroit ⚠️</span>
+    </div>
+    <div class="matchup-list">
+
+      <div class="matchup predicted-win">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s1">1</div>
+          <div class="team-name advance">FLORIDA ⚠️</div>
+          <div class="team-record">26-6</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">16</div>
+          <div class="team-name">HOWARD / FURMAN</div>
+          <div class="team-record">Auto</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">8</div>
+          <div class="team-name advance">NEBRASKA</div>
+          <div class="team-record">26-5</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">9</div>
+          <div class="team-name">NC STATE</div>
+          <div class="team-record">23-10</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num s2">5</div>
+          <div class="team-name advance">TENNESSEE</div>
+          <div class="team-record">22-11</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">12</div>
+          <div class="team-name updated-team">AKRON</div>
+          <div class="team-record">29-5</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s4">4</div>
+          <div class="team-name advance">ST. LOUIS</div>
+          <div class="team-record">28-4</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">13</div>
+          <div class="team-name">YALE</div>
+          <div class="team-record">23-5</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s3">3</div>
+          <div class="team-name advance">GONZAGA</div>
+          <div class="team-record">30-3</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">14</div>
+          <div class="team-name">FURMAN</div>
+          <div class="team-record">22-12</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num">6</div>
+          <div class="team-name advance">KANSAS</div>
+          <div class="team-record">23-10</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">11</div>
+          <div class="team-name updated-team">CAL BAPTIST</div>
+          <div class="team-record">25-8</div>
+        </div>
+      </div>
+
+      <div class="matchup">
+        <div class="matchup-round-label">Round of 64</div>
+        <div class="team-row">
+          <div class="seed-num s2">2</div>
+          <div class="team-name advance">DUKE</div>
+          <div class="team-record">32-2</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">15</div>
+          <div class="team-name">McNEESE</div>
+          <div class="team-record">28-5</div>
+        </div>
+      </div>
+
+      <div class="matchup updated-match">
+        <div class="matchup-round-label">Round of 64 <span class="updated-badge">↺ Updated</span></div>
+        <div class="team-row">
+          <div class="seed-num">7</div>
+          <div class="team-name advance">VILLANOVA</div>
+          <div class="team-record">24-8</div>
+        </div>
+        <div class="team-row">
+          <div class="seed-num">10</div>
+          <div class="team-name updated-team">HAWAII</div>
+          <div class="team-record">24-8</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="advancement-section">
+      <div class="adv-row r32"><span class="adv-label">Sweet 16</span><span class="adv-team r32-t">Florida · Duke</span></div>
+      <div class="adv-row s16"><span class="adv-label">Elite 8</span><span class="adv-team s16-t">Florida</span></div>
+      <div class="adv-row e8"><span class="adv-label">Final 4</span><span class="adv-team e8-t">DUKE</span></div>
+    </div>
+  </div>
+
+</div><!-- end regions-grid -->
+</div><!-- end bracket-wrapper -->
+
+<!-- FINAL FOUR -->
+<div class="section-title">Final Four — Indianapolis, IN · April 4–6</div>
+<div class="final-rounds">
+  <div class="final-card">
+    <div class="final-card-header">Semifinal 1 · East vs West</div>
+    <div class="final-matchup">
+      <div class="final-team winner">
+        <span>(1) MICHIGAN</span>
+        <span class="final-seed">30-2 · Big Ten</span>
+      </div>
+      <div class="vs-label">VS</div>
+      <div class="final-team loser">
+        <span>(1) DUKE</span>
+        <span class="final-seed">31-2 · ACC</span>
+      </div>
+    </div>
+  </div>
+  <div class="final-card">
+    <div class="final-card-header">Semifinal 2 · South vs Midwest</div>
+    <div class="final-matchup">
+      <div class="final-team winner">
+        <span>(1) ARIZONA</span>
+        <span class="final-seed">32-2 · Big 12</span>
+      </div>
+      <div class="vs-label">VS</div>
+      <div class="final-team loser">
+        <span>(2) HOUSTON</span>
+        <span class="final-seed">28-5 · Big 12 ⚠️ Dropped to 2-seed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NATIONAL FINAL -->
+<div class="section-title">National Championship</div>
+<div class="final-rounds" style="max-width:440px;">
+  <div class="final-card" style="grid-column:1/-1">
+    <div class="final-card-header">Championship Game · April 6 · Indianapolis</div>
+    <div class="final-matchup">
+      <div class="final-team winner" style="font-size:16px;">
+        <span>🏆 (1) MICHIGAN</span>
+        <span class="final-seed">Big Ten Champs</span>
+      </div>
+      <div class="vs-label">VS</div>
+      <div class="final-team loser">
+        <span>(1) DUKE</span>
+        <span class="final-seed">ACC Champs</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAMPION -->
+<div class="champion-section" style="margin: 12px auto 32px; max-width:500px;">
+  <div class="champ-label">🏆 2026 National Champion</div>
+  <div class="champ-name">MICHIGAN</div>
+  <div class="champ-record">Predicted Final Record: 36-2</div>
+  <div class="champ-path">
+    <div class="path-badge">Big Ten Champs</div>
+    <div class="path-badge">51% FG% — <span>Best in Nation</span></div>
+    <div class="path-badge">Def. Duke in Final</div>
+    <div class="path-badge">Indianapolis Hosted</div>
+  </div>
+  <div style="margin-top:14px; font-size:12px; color:var(--muted); line-height:1.8; font-family:'Barlow',sans-serif; padding:0 10px;">
+    Michigan's elite field goal efficiency (51%), dominant Big Ten campaign, and tournament-tested depth make them the most complete team in the field. Guard depth concerns are real, but the Wolverines' interior dominance and elite two-point offense create matchup nightmares in every round. Duke is the greatest threat — their experience and coaching give them a path — but Michigan's ceiling is the highest in the bracket.
+  </div>
+  <div style="margin-top:12px; padding:8px 12px; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.2); border-radius:5px; font-size:11px; color:var(--updated); letter-spacing:1px;">
+    ⚠️ PENDING TONIGHT: Florida 1-seed status & Big Ten / SEC / A-10 / American / Ivy champs TBD. Refresh after 6PM Selection Show.
+  </div>
+</div>
+
+</body>
+</html>
