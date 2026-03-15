@@ -1,6 +1,6 @@
 # 🏀 2026 NCAA Tournament Bracket — Harley Predictions
 
-**Live Site:** `https://[your-username].github.io/ncaa-bracket-2026`
+**Live Site:** `https://fromharley.github.io/ncaa-bracket-2026`
 
 A real-time tracked NCAA Tournament bracket built and maintained by **Alex & Dad Harley** through the full 2026 March Madness run — Selection Sunday (Mar 15) through the National Championship (Apr 6) in Indianapolis.
 
